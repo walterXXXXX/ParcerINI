@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -6,13 +6,13 @@
 #include <memory>
 #include <any>
 
-// Объект класса IniParcer считывает и хранит данные INI файла. 
-// Данные хранятся в контейнерах std::map для быстрого доступа по ключу:
-// названию секции и переменной. 
-// Используется контейнер "верхнего" уровня для хранения секций std::map sections:
-// ключ - имя секции std::string, значение - контейнер переменных секции std::map
-// Контейнер переменных секции std::map: 
-// ключ - имя переменной std::string, значение - значение переменной типа std::any 
+// РћР±СЉРµРєС‚ РєР»Р°СЃСЃР° IniParcer СЃС‡РёС‚С‹РІР°РµС‚ Рё С…СЂР°РЅРёС‚ РґР°РЅРЅС‹Рµ INI С„Р°Р№Р»Р°. 
+// Р”Р°РЅРЅС‹Рµ С…СЂР°РЅСЏС‚СЃСЏ РІ РєРѕРЅС‚РµР№РЅРµСЂР°С… std::map РґР»СЏ Р±С‹СЃС‚СЂРѕРіРѕ РґРѕСЃС‚СѓРїР° РїРѕ РєР»СЋС‡Сѓ:
+// РЅР°Р·РІР°РЅРёСЋ СЃРµРєС†РёРё Рё РїРµСЂРµРјРµРЅРЅРѕР№. 
+// РСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ РєРѕРЅС‚РµР№РЅРµСЂ "РІРµСЂС…РЅРµРіРѕ" СѓСЂРѕРІРЅСЏ РґР»СЏ С…СЂР°РЅРµРЅРёСЏ СЃРµРєС†РёР№ std::map sections:
+// РєР»СЋС‡ - РёРјСЏ СЃРµРєС†РёРё std::string, Р·РЅР°С‡РµРЅРёРµ - РєРѕРЅС‚РµР№РЅРµСЂ РїРµСЂРµРјРµРЅРЅС‹С… СЃРµРєС†РёРё std::map
+// РљРѕРЅС‚РµР№РЅРµСЂ РїРµСЂРµРјРµРЅРЅС‹С… СЃРµРєС†РёРё std::map: 
+// РєР»СЋС‡ - РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ std::string, Р·РЅР°С‡РµРЅРёРµ - Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ С‚РёРїР° std::any 
 
 class IniParcer {
 public:
@@ -22,12 +22,12 @@ public:
 	T getValue(std::string varName) {  // varName = "section.value"
 		auto it = std::find(varName.cbegin(), varName.cend(), '.');
 		if (it == varName.cend() || it == varName.cbegin() || it == (varName.cend() - 1))
-			throw std::logic_error("Ошибка в имени запрашиваемой переменной <" + _fileName + ">\n");
+			throw std::logic_error("РћС€РёР±РєР° РІ РёРјРµРЅРё Р·Р°РїСЂР°С€РёРІР°РµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ <" + _fileName + ">\n");
 
 		std::string _sec = std::string(varName.cbegin(), it);
 		std::string _var(it + 1, varName.cend());
 		if (sections.find(_sec) == sections.cend()) {
-			std::string res = "Ошибка! Отсутствует секция с именем " + _sec + "\n Допустимые имена секций: \n";
+			std::string res = "РћС€РёР±РєР°! РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ СЃРµРєС†РёСЏ СЃ РёРјРµРЅРµРј " + _sec + "\n Р”РѕРїСѓСЃС‚РёРјС‹Рµ РёРјРµРЅР° СЃРµРєС†РёР№: \n";
 			for (auto& const section : sections)
 				res += (section.first + '\n');
 			throw std::invalid_argument(res);
@@ -37,29 +37,29 @@ public:
 			if (variable.first == _var && variable.second.type() == typeid(T))
 				return std::any_cast<T>(variable.second);
 
-		std::string res = "В секции отсутствует значение для запрашиваемой переменной " + _var + 
-			" типа " + (typeid(T).name() == typeid(std::string).name() ? "std::string" : typeid(T).name()) + 
-			". Доступные имена переменных секции: \n";
+		std::string res = "Р’ СЃРµРєС†РёРё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р·РЅР°С‡РµРЅРёРµ РґР»СЏ Р·Р°РїСЂР°С€РёРІР°РµРјРѕР№ РїРµСЂРµРјРµРЅРЅРѕР№ " + _var + 
+			" С‚РёРїР° " + (typeid(T).name() == typeid(std::string).name() ? "std::string" : typeid(T).name()) + 
+			". Р”РѕСЃС‚СѓРїРЅС‹Рµ РёРјРµРЅР° РїРµСЂРµРјРµРЅРЅС‹С… СЃРµРєС†РёРё: \n";
 
 		for (auto& const variable : sections[_sec]) {
 			std::string varType = variable.second.type().name();
 			if (varType == typeid(std::string).name())
 				varType = "std::string";
-			res += (variable.first + " типа " + varType + '\n');
+			res += (variable.first + " С‚РёРїР° " + varType + '\n');
 		}
 		throw std::invalid_argument(res);
 	}
 
-	void print(); // печать содержимого 
+	void print(); // РїРµС‡Р°С‚СЊ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ 
 
 private:
 	std::string _fileName = "";
 
  	std::map <std::string, std::map <std::string, std::any>> sections;
 
-	void addSection(std::string name); // добавляет новую секцию
+	void addSection(std::string name); // РґРѕР±Р°РІР»СЏРµС‚ РЅРѕРІСѓСЋ СЃРµРєС†РёСЋ
 
-	void addVariable(std::string secName, std::string varName, std::any variable); // добавляет переменную в контейнер секции secName 
+	void addVariable(std::string secName, std::string varName, std::any variable); // РґРѕР±Р°РІР»СЏРµС‚ РїРµСЂРµРјРµРЅРЅСѓСЋ РІ РєРѕРЅС‚РµР№РЅРµСЂ СЃРµРєС†РёРё secName 
 
-	void trimStr(std::string& str); // вспомогательная функция, удаляет пробелы и табуляции в начале и конце строки
+	void trimStr(std::string& str); // РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ, СѓРґР°Р»СЏРµС‚ РїСЂРѕР±РµР»С‹ Рё С‚Р°Р±СѓР»СЏС†РёРё РІ РЅР°С‡Р°Р»Рµ Рё РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё
 };

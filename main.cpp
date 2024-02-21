@@ -1,4 +1,4 @@
-#include <iostream>
+п»ї#include <iostream>
 #include <exception>
 #include "parcer.h"
 
@@ -6,11 +6,11 @@ int main() {
 	setlocale(LC_ALL, "");
 
 	try {
-		IniParcer parcer("parcer.ini"); // файл parcer.ini необходимо перенести в каталог с exe файлом
+		IniParcer parcer("parcer.ini"); // С„Р°Р№Р» parcer.ini РЅРµРѕР±С…РѕРґРёРјРѕ РїРµСЂРµРЅРµСЃС‚Рё РІ РєР°С‚Р°Р»РѕРі СЃ exe С„Р°Р№Р»РѕРј
 //		parcer.print();
 		
 		auto value = parcer.getValue<double>("Section1.var1");
-		std::cout << "Значение переменной Section1.var1 = " << value << std::endl;
+		std::cout << "Р—РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ Section1.var1 = " << value << std::endl;
 	} 
 	catch (const std::runtime_error& ex) {
 		std::cout << ex.what() << std::endl;

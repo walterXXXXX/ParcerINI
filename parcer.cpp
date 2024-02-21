@@ -1,4 +1,4 @@
-#include <fstream>
+п»ї#include <fstream>
 #include <sstream>
 #include <exception>
 #include <string>
@@ -7,68 +7,68 @@
 
 IniParcer::IniParcer(std::string fileName) {
 	std::ifstream fin(fileName);
-	if (!fin.is_open()) throw std::runtime_error("Файл " + fileName + " не найден\n");
+	if (!fin.is_open()) throw std::runtime_error("Р¤Р°Р№Р» " + fileName + " РЅРµ РЅР°Р№РґРµРЅ\n");
 	_fileName = fileName;
 
-	int countStr = 0;			// счетчик строк
-	std::string str = "";		// считываемая строка
-	std::string secName = "";	// имя текущей секции
-	bool isEmpty = true;		// флаг отсутствия считанных секций в парсере
+	int countStr = 0;			// СЃС‡РµС‚С‡РёРє СЃС‚СЂРѕРє
+	std::string str = "";		// СЃС‡РёС‚С‹РІР°РµРјР°СЏ СЃС‚СЂРѕРєР°
+	std::string secName = "";	// РёРјСЏ С‚РµРєСѓС‰РµР№ СЃРµРєС†РёРё
+	bool isEmpty = true;		// С„Р»Р°Рі РѕС‚СЃСѓС‚СЃС‚РІРёСЏ СЃС‡РёС‚Р°РЅРЅС‹С… СЃРµРєС†РёР№ РІ РїР°СЂСЃРµСЂРµ
 
 	while (std::getline(fin, str)) {
-		countStr++; // номер текущей строки
+		countStr++; // РЅРѕРјРµСЂ С‚РµРєСѓС‰РµР№ СЃС‚СЂРѕРєРё
 
-		// убираем из строки комментарий - все, начиная с символа ';'
+		// СѓР±РёСЂР°РµРј РёР· СЃС‚СЂРѕРєРё РєРѕРјРјРµРЅС‚Р°СЂРёР№ - РІСЃРµ, РЅР°С‡РёРЅР°СЏ СЃ СЃРёРјРІРѕР»Р° ';'
 		str.erase(find(str.cbegin(), str.cend(), ';'), str.end()); 
-		trimStr(str); // и пробелы в начале и в конце строки 
+		trimStr(str); // Рё РїСЂРѕР±РµР»С‹ РІ РЅР°С‡Р°Р»Рµ Рё РІ РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё 
 //		std::cout << str << std::endl;
-		if (str == "") continue; // если в итоге стока осталась пустой, переходим на следующую
+		if (str == "") continue; // РµСЃР»Рё РІ РёС‚РѕРіРµ СЃС‚РѕРєР° РѕСЃС‚Р°Р»Р°СЃСЊ РїСѓСЃС‚РѕР№, РїРµСЂРµС…РѕРґРёРј РЅР° СЃР»РµРґСѓСЋС‰СѓСЋ
 		
 		auto it = str.cbegin();
 		if (*it != '[' && isEmpty)
-			throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-				". Не найдено объявление ни одной секции\n");
+			throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+				". РќРµ РЅР°Р№РґРµРЅРѕ РѕР±СЉСЏРІР»РµРЅРёРµ РЅРё РѕРґРЅРѕР№ СЃРµРєС†РёРё\n");
 
 		if (*it == '[') {
-			// считываем имя секции
+			// СЃС‡РёС‚С‹РІР°РµРј РёРјСЏ СЃРµРєС†РёРё
 			auto it1 = find(it, str.cend(), ']');
 			if (it1 == str.cend())
-				throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-					". Не найден символ ']' в объявлении имени секции\n");
+				throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+					". РќРµ РЅР°Р№РґРµРЅ СЃРёРјРІРѕР» ']' РІ РѕР±СЉСЏРІР»РµРЅРёРё РёРјРµРЅРё СЃРµРєС†РёРё\n");
 			if (it1 != str.cend()-1)
-				throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-					". Недопустимые символы после имени секции []..\n"); // возможный комментарий и пробелы уже удалены
+				throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+					". РќРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹ РїРѕСЃР»Рµ РёРјРµРЅРё СЃРµРєС†РёРё []..\n"); // РІРѕР·РјРѕР¶РЅС‹Р№ РєРѕРјРјРµРЅС‚Р°СЂРёР№ Рё РїСЂРѕР±РµР»С‹ СѓР¶Рµ СѓРґР°Р»РµРЅС‹
 			
 			secName = std::string(it + 1, it1);
 			if (secName == "")
-				throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-					". Отсутствует имя секции\n");
+				throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+					". РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёРјСЏ СЃРµРєС†РёРё\n");
 			addSection(secName);
 			isEmpty = false;
 		}
 		else {
-			// считываем имя переменной
+			// СЃС‡РёС‚С‹РІР°РµРј РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№
 			auto it2 = find(it, str.cend(), '=');
 			if (it2 == str.cend())
-				throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-					". Отсутствует знак равенства '=' в объявлении переменной\n");
+				throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+					". РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ Р·РЅР°Рє СЂР°РІРµРЅСЃС‚РІР° '=' РІ РѕР±СЉСЏРІР»РµРЅРёРё РїРµСЂРµРјРµРЅРЅРѕР№\n");
 			if (it2 == str.cbegin())
-				throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-					". Отсутствует имя переменной слева от знака '='\n");
+				throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+					". РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ РёРјСЏ РїРµСЂРµРјРµРЅРЅРѕР№ СЃР»РµРІР° РѕС‚ Р·РЅР°РєР° '='\n");
 
-			// получаем имя и значение переменной слева и справа от =
+			// РїРѕР»СѓС‡Р°РµРј РёРјСЏ Рё Р·РЅР°С‡РµРЅРёРµ РїРµСЂРµРјРµРЅРЅРѕР№ СЃР»РµРІР° Рё СЃРїСЂР°РІР° РѕС‚ =
 			std::string varName(str.cbegin(), (it2));
 			std::string varValue((it2 + 1), str.cend());
-			// удаляем пробелы и табуляции в начале и конце полученных значений
+			// СѓРґР°Р»СЏРµРј РїСЂРѕР±РµР»С‹ Рё С‚Р°Р±СѓР»СЏС†РёРё РІ РЅР°С‡Р°Р»Рµ Рё РєРѕРЅС†Рµ РїРѕР»СѓС‡РµРЅРЅС‹С… Р·РЅР°С‡РµРЅРёР№
 			trimStr(varName);
 			trimStr(varValue);
-			// проверяем допустимость имени переменной
+			// РїСЂРѕРІРµСЂСЏРµРј РґРѕРїСѓСЃС‚РёРјРѕСЃС‚СЊ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№
 			if (find(varName.cbegin(), varName.cend(), ' ') != varName.cend() || 
 				find(varName.cbegin(), varName.cend(), '\t') != varName.cend())
-					throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-						". Недопустимый символ в имени переменной\n");
+					throw std::logic_error("РћС€РёР±РєР° РІ СЃС‚СЂРѕРєРµ " + std::to_string(countStr) +
+						". РќРµРґРѕРїСѓСЃС‚РёРјС‹Р№ СЃРёРјРІРѕР» РІ РёРјРµРЅРё РїРµСЂРµРјРµРЅРЅРѕР№\n");
 
-			// определяем тип переменной и сохраняем ее значение 
+			// РѕРїСЂРµРґРµР»СЏРµРј С‚РёРї РїРµСЂРµРјРµРЅРЅРѕР№ Рё СЃРѕС…СЂР°РЅСЏРµРј РµРµ Р·РЅР°С‡РµРЅРёРµ 
 			enum class Vartype {
 				INT,
 				DOUBLE,
@@ -113,24 +113,24 @@ IniParcer::IniParcer(std::string fileName) {
 		}
 	}	
 	if (isEmpty)
-		throw std::logic_error("Файл " + fileName + " пуст\n");
+		throw std::logic_error("Р¤Р°Р№Р» " + fileName + " РїСѓСЃС‚\n");
 	fin.close();
 }
 
 void IniParcer::addSection(std::string secName) {
-	// добавляем секцию secName, если она еще не существует, иначе игнор
+	// РґРѕР±Р°РІР»СЏРµРј СЃРµРєС†РёСЋ secName, РµСЃР»Рё РѕРЅР° РµС‰Рµ РЅРµ СЃСѓС‰РµСЃС‚РІСѓРµС‚, РёРЅР°С‡Рµ РёРіРЅРѕСЂ
 	sections.insert(std::make_pair(secName, std::map<std::string, std::any>()));
 }
 
 void IniParcer::addVariable(std::string secName, std::string varName, std::any variable) {
 	if (sections.find(secName) == sections.cend())
-		throw std::invalid_argument("Невозможно добавить переменную, т.к. секция с именем " + secName + " не найдена\n");
-	// добавляем переменную varName в найденную секцию с перезаписью значения, если она уже существует
+		throw std::invalid_argument("РќРµРІРѕР·РјРѕР¶РЅРѕ РґРѕР±Р°РІРёС‚СЊ РїРµСЂРµРјРµРЅРЅСѓСЋ, С‚.Рє. СЃРµРєС†РёСЏ СЃ РёРјРµРЅРµРј " + secName + " РЅРµ РЅР°Р№РґРµРЅР°\n");
+	// РґРѕР±Р°РІР»СЏРµРј РїРµСЂРµРјРµРЅРЅСѓСЋ varName РІ РЅР°Р№РґРµРЅРЅСѓСЋ СЃРµРєС†РёСЋ СЃ РїРµСЂРµР·Р°РїРёСЃСЊСЋ Р·РЅР°С‡РµРЅРёСЏ, РµСЃР»Рё РѕРЅР° СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚
 	sections[secName].insert_or_assign(varName, variable);
 }	
 
 void IniParcer::trimStr(std::string& str) { 
-	// вспомогательная функция, удаляет пробелы и табуляции в начале и конце строки
+	// РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ, СѓРґР°Р»СЏРµС‚ РїСЂРѕР±РµР»С‹ Рё С‚Р°Р±СѓР»СЏС†РёРё РІ РЅР°С‡Р°Р»Рµ Рё РєРѕРЅС†Рµ СЃС‚СЂРѕРєРё
 	auto it1 = str.cbegin();
 	auto it2 = str.cend();
 	while ((it1 != it2) && (*it1 == ' ' || *it1 == '\t'))
@@ -140,7 +140,7 @@ void IniParcer::trimStr(std::string& str) {
 	str = std::string(it1, it2);
 }
 
-void IniParcer::print() {	// печать содержимого
+void IniParcer::print() {	// РїРµС‡Р°С‚СЊ СЃРѕРґРµСЂР¶РёРјРѕРіРѕ
 	std::cout << std::endl;
 	for (auto& sec : sections) {
 		std::cout << "[" << sec.first << "]" << std::endl;
