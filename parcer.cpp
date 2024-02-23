@@ -2,7 +2,6 @@
 #include <sstream>
 #include <exception>
 #include <string>
-#include <typeinfo>
 #include "parcer.h"
 
 IniParcer::IniParcer(std::string fileName) {
@@ -27,7 +26,7 @@ IniParcer::IniParcer(std::string fileName) {
 		auto it = str.cbegin();
 		if (*it != '[' && isEmpty)
 			throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
-				". Не найдено объявление ни одной секции\n");
+				". Не найдено объявление первой секции\n");
 
 		if (*it == '[') {
 			// считываем имя секции
@@ -47,7 +46,7 @@ IniParcer::IniParcer(std::string fileName) {
 			isEmpty = false;
 		}
 		else {
-			// считываем имя переменной
+			// считываем имя и значение переменной
 			auto it2 = find(it, str.cend(), '=');
 			if (it2 == str.cend())
 				throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
@@ -67,49 +66,7 @@ IniParcer::IniParcer(std::string fileName) {
 				find(varName.cbegin(), varName.cend(), '\t') != varName.cend())
 					throw std::logic_error("Ошибка в строке " + std::to_string(countStr) +
 						". Недопустимый символ в имени переменной\n");
-
-			// определяем тип переменной и сохраняем ее значение 
-			enum class Vartype {
-				INT,
-				DOUBLE,
-				STRING
-			};
-			Vartype varType = Vartype::INT;
-			if (varValue == "")
-				varType = Vartype::STRING;
-			for (auto it = varValue.cbegin(); it < varValue.cend(); it++) {
-				if ((*it < '0' || *it > '9') && *it != '.' && *it != '-') {
-					varType = Vartype::STRING;
-					break;
-				}
-				if (*it == '-' && it != varValue.cbegin()) {
-					varType = Vartype::STRING;
-					break;
-				}
-				if (*it == '.' && (varType == Vartype::DOUBLE || it == varValue.cbegin() || it == varValue.cend() - 1)) {
-					varType = Vartype::STRING;
-					break;
-				}
-				if (*it == '.' && varType == Vartype::INT) {
-					varType = Vartype::DOUBLE;
-				}
-			}
-
-			switch (varType)
-			{
-			case Vartype::INT:
-				addVariable(secName, varName, std::stoi(varValue));
-				break;
-			case Vartype::DOUBLE:
-				addVariable(secName, varName, std::stod(varValue));
-				break;
-			case Vartype::STRING:
-				addVariable(secName, varName, varValue);
-				break;
-			default:
-				break;
-			}
-
+			addVariable(secName, varName, varValue); // сохраняем значение переменной в секции 
 		}
 	}	
 	if (isEmpty)
@@ -119,10 +76,10 @@ IniParcer::IniParcer(std::string fileName) {
 
 void IniParcer::addSection(std::string secName) {
 	// добавляем секцию secName, если она еще не существует, иначе игнор
-	sections.insert(std::make_pair(secName, std::map<std::string, std::any>()));
+	sections.insert(std::make_pair(secName, std::map<std::string, std::string>()));
 }
 
-void IniParcer::addVariable(std::string secName, std::string varName, std::any variable) {
+void IniParcer::addVariable(std::string secName, std::string varName, std::string variable) {
 	if (sections.find(secName) == sections.cend())
 		throw std::invalid_argument("Невозможно добавить переменную, т.к. секция с именем " + secName + " не найдена\n");
 	// добавляем переменную varName в найденную секцию с перезаписью значения, если она уже существует
@@ -140,19 +97,41 @@ void IniParcer::trimStr(std::string& str) {
 	str = std::string(it1, it2);
 }
 
+std::string IniParcer::getValueString(std::string varName) { // varName = "section.value"
+	auto it = std::find(varName.cbegin(), varName.cend(), '.');
+	if (it == varName.cend() || it == varName.cbegin() || it == (varName.cend() - 1))
+		throw std::logic_error("Ошибка в запросе переменной переменной <" + varName + ">\n");
+
+	std::string _sec = std::string(varName.cbegin(), it);
+	std::string _var(it + 1, varName.cend());
+
+	if (sections.find(_sec) == sections.cend()) {
+		std::string res = "Ошибка! Отсутствует секция с именем " + _sec + "\n Допустимые имена секций: \n";
+		for (const auto& section : sections)
+			res += (section.first + '\n');
+		throw std::invalid_argument(res);
+	}
+
+	for (const auto& variable : sections[_sec])
+		if (variable.first == _var)
+			return variable.second;
+
+	std::string res = "В секции отсутствует значение для запрашиваемой переменной " + _var +
+		". Доступные имена переменных секции: \n";
+
+	for (const auto& variable : sections[_sec]) {
+		res += (variable.first + '\n');
+	}
+	throw std::invalid_argument(res);
+
+}
+
 void IniParcer::print() {	// печать содержимого
 	std::cout << std::endl;
-	for (auto& sec : sections) {
+	for (const auto& sec : sections) {
 		std::cout << "[" << sec.first << "]" << std::endl;
-		for (auto& var : sec.second) {
-			std::cout << var.first << "=";
-			if (var.second.type() == typeid(int))
-				std::cout << std::any_cast<int>(var.second);
-			if (var.second.type() == typeid(double))
-				std::cout << std::any_cast<double>(var.second);
-			if (var.second.type() == typeid(std::string))
-				std::cout << std::any_cast<std::string>(var.second);
-			std::cout << std::endl;
+		for (const auto& var : sec.second) {
+			std::cout << var.first << "=" << var.second << std::endl;
 		}
 		std::cout << std::endl;
 	}

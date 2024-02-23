@@ -7,8 +7,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 project(Parcer_of_INI_files)
 
-add_library(ParcerLib "parcer.h" "parcer.cpp"  )
-
-add_executable(parcerINI "main.cpp" "parcer.h" "parcer.cpp"  )
-
-target_link_libraries(parcerINI ParcerLib)
+add_executable(parcerINI main.cpp parcer.h parcer.cpp)

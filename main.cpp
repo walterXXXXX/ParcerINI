@@ -18,6 +18,12 @@ int main() {
 	catch (const std::logic_error& ex) {
 		std::cout << ex.what() << std::endl;
 	}
+	catch (const std::invalid_argument& ex) {
+		std::cout << ex.what() << std::endl;
+	}
+	catch (const std::out_of_range& ex) {
+		std::cout << ex.what() << std::endl;
+	}
 
 	return 0;
 }
