@@ -20,7 +20,7 @@ public:
 	T getValue(std::string varName) {  // varName = "section.value"
 		// при попытке вызвать тип, не определенный в специализациях шаблона,
 		// будет выдана ошибка времени компиляции
-		static_assert(sizeof(T), "not implemented type for getValue()");
+		static_assert(sizeof(T) == -1, "not implemented type for getValue()");
 	}
 
 	template<>
